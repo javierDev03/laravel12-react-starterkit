@@ -119,6 +119,15 @@ class MenuSeeder extends Seeder
             'parent_id' => $utilities->id,
         ]);
 
+        Menu::create([
+            'title' => 'Clients',
+            'icon' => 'Users',
+            'route' => '/clients',
+            'order' => 4,
+            'permission_name' => 'clients-view',
+            'parent_id' => $utilities->id,
+        ]);
+
         $permissions = Menu::pluck('permission_name')->unique()->filter();
 
         foreach ($permissions as $permName) {

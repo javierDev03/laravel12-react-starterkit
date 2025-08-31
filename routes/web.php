@@ -7,13 +7,14 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UserFileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SettingAppController;
 use App\Http\Controllers\MediaFolderController;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return Inertia::render('auth/login');
 })->name('home');
 
 Route::middleware(['auth', 'menu.permission'])->group(function () {
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::post('/files', [UserFileController::class, 'store'])->name('files.store');
     Route::delete('/files/{id}', [UserFileController::class, 'destroy'])->name('files.destroy');
     Route::resource('media', MediaFolderController::class);
+    Route::resource('clients', ClientController::class);
 });
 
 require __DIR__ . '/settings.php';
