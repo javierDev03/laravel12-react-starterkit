@@ -24,6 +24,7 @@ class User extends Authenticatable implements HasMedia
         'name',
         'email',
         'password',
+        'branch_id',
     ];
 
     /**
@@ -53,4 +54,16 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(MediaFolder::class);
     }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->hasRole('admin');
+    }
+
+
 }

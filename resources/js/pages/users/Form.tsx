@@ -21,15 +21,17 @@ interface User {
   name: string;
   email: string;
   roles?: string[];
+
 }
 
 interface Props {
   user?: User;
   roles: Role[];
   currentRoles?: string[];
+  branches: Branch[];
 }
 
-export default function UserForm({ user, roles, currentRoles }: Props) {
+export default function UserForm({ user, roles, currentRoles, branches }: Props) {
   const isEdit = !!user;
 
   const { data, setData, post, put, processing, errors } = useForm({
@@ -37,6 +39,7 @@ export default function UserForm({ user, roles, currentRoles }: Props) {
     email: user?.email || '',
     password: '',
     roles: currentRoles || [],
+      branch_id: user?.branch_id || '',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -134,8 +137,29 @@ export default function UserForm({ user, roles, currentRoles }: Props) {
                   {errors.roles && <p className="text-sm text-red-500 mt-2">{errors.roles}</p>}
                 </div>
               </div>
+                {/* Branch selection */}
+                <div>
+                    <Label className="mb-2 block">Sucursal (opcional)</Label>
+                    <Select
+                        value={data.branch_id ? String(data.branch_id) : ''}
+                        onValueChange={(value) => setData('branch_id', value)}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Selecciona una sucursal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {branches.map((branch) => (
+                                <SelectItem key={branch.id} value={String(branch.id)}>
+                                    {branch.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {errors.branch_id && <p className="text-sm text-red-500 mt-2">{errors.branch_id}</p>}
+                </div>
 
-              <Separator />
+
+                <Separator />
 
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2">
                 <Link href="/users" className="w-full sm:w-auto">

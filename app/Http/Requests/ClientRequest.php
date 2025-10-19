@@ -3,32 +3,28 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Client;
 
 class ClientRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
-        $clientId = $this->route('client')?->id; 
+        $clientId = $this->route('client') instanceof Client
+            ? $this->route('client')->id
+            : $this->route('client');
+
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', 'unique:clients,email,' . $clientId,],
+            'email' => ['nullable', 'email', 'max:255', 'unique:clients,email,' . $clientId],
             'phone' => ['nullable', 'string', 'max:20'],
             'notes' => ['nullable', 'string'],
             'requires_invoice' => ['required', 'boolean'],
-            'rfc' => ['nullable', 'string', 'size:13', 'required_if:requires_invoice,true', 'unique:clients,rfc,' . $clientId,],
+            'rfc' => ['nullable', 'string', 'size:13', 'required_if:requires_invoice,true', 'unique:clients,rfc,' . $clientId],
             'business_name' => ['nullable', 'string', 'max:255', 'required_if:requires_invoice,true'],
             'fiscal_regime' => ['nullable', 'string', 'size:3', 'required_if:requires_invoice,true'],
             'cfdi_usage' => ['nullable', 'string', 'size:3', 'required_if:requires_invoice,true'],

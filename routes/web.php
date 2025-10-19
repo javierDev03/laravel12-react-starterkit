@@ -7,11 +7,14 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\UserFileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SettingAppController;
 use App\Http\Controllers\MediaFolderController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -40,6 +43,10 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::delete('/files/{id}', [UserFileController::class, 'destroy'])->name('files.destroy');
     Route::resource('media', MediaFolderController::class);
     Route::resource('clients', ClientController::class);
+    Route::resource('branches', BranchController::class);
+    Route::put('/branches/{branch}/toggle-active', [BranchController::class, 'toggleActive']);
+    Route::resource('categories', CategoryController::class);
+    Route::resource('products', ProductController::class);
 });
 
 require __DIR__ . '/settings.php';

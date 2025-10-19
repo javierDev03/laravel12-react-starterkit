@@ -8,24 +8,39 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
+use App\Models\Branch;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('roles')->latest()->paginate(10);
+        $branches = Branch::all();
+
+        $query = User::with(['roles', 'branch'])->latest();
+
+
+        if ($request->filled('branch_id') && $request->branch_id !== '__all__') {
+            $query->where('branch_id', $request->branch_id);
+        }
+
+        $users = $query->paginate(10)->withQueryString();
 
         return Inertia::render('users/Index', [
             'users' => $users,
+            'branches' => $branches,
+            'filters' => $request->only('branch_id'),
         ]);
     }
+
 
     public function create()
     {
         $roles = Role::all();
+        $branches = Branch::all();
 
         return Inertia::render('users/Form', [
             'roles' => $roles,
+            'branches' => $branches,
         ]);
     }
 
@@ -37,12 +52,14 @@ class UserController extends Controller
             'password' => ['required', 'string', 'min:6'],
             'roles'    => ['required', 'array', 'min:1'],
             'roles.*'  => ['required', Rule::exists('roles', 'name')],
+            'branch_id' => ['nullable', Rule::exists('branches', 'id')], // 👈
         ]);
 
         $user = User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'branch_id' => $validated['branch_id'] ?? null,
         ]);
 
         $user->assignRole($validated['roles']);
@@ -53,10 +70,12 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $roles = Role::all();
+        $branches = Branch::all();
 
         return Inertia::render('users/Form', [
-            'user'         => $user->only(['id', 'name', 'email']),
+            'user'         => $user->only(['id', 'name', 'email', 'branch_id']),
             'roles'        => $roles,
+            'branches'     => $branches,
             'currentRoles' => $user->roles->pluck('name')->toArray(), // multiple roles
         ]);
     }
@@ -69,6 +88,7 @@ class UserController extends Controller
             'password' => ['nullable', 'string', 'min:6'],
             'roles'    => ['required', 'array', 'min:1'],
             'roles.*'  => ['required', Rule::exists('roles', 'name')],
+            'branch_id' => ['nullable', Rule::exists('branches', 'id')], // 👈
         ]);
 
         $user->update([
@@ -77,6 +97,7 @@ class UserController extends Controller
             'password' => $validated['password']
                 ? Hash::make($validated['password'])
                 : $user->password,
+            'branch_id' => $validated['branch_id'] ?? null,
         ]);
 
         $user->syncRoles($validated['roles']);

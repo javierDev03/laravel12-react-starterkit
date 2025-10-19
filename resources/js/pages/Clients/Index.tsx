@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Head } from '@inertiajs/react'
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -59,10 +60,13 @@ export default function ClientsIndex() {
   const breadcrumbs = [{ title: 'Clients', href: '/clients' }];
 
   return (
-    <AppLayout breadcrumbs={breadcrumbs}>
-      <div className="flex-1 p-4 md:p-6">
-        <Card className="max-w-5xl mx-auto">
-          <CardHeader>
+    <>
+      <Head title="Clients" />
+      <AppLayout breadcrumbs={[{ title: 'Clients', href: '/clients' }]}>
+
+        <div className="flex-1 p-4 md:p-6">
+          <Card className="max-w-5xl mx-auto">
+            <CardHeader>
             <CardTitle>Clients</CardTitle>
           </CardHeader>
 
@@ -143,5 +147,6 @@ export default function ClientsIndex() {
         </Card>
       </div>
     </AppLayout>
+    </>
   );
 }

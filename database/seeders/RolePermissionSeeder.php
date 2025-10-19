@@ -25,6 +25,8 @@ class RolePermissionSeeder extends Seeder
                 'users-view',
                 'roles-view',
                 'clients-view',
+                'branches-view',
+                'products-view',
             ],
             'Settings' => [
                 'settings-view',
