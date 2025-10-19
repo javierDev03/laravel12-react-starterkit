@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Sale extends Model
 {
     protected $fillable = [
-        'user_id', 'branch_id', 'total', 'discount', 'tax', 'status', 'payment_method'
+        'user_id', 'branch_id', 'client_id', 'total', 'discount', 'tax', 'status', 'payment_method'
     ];
 
     protected $casts = [
@@ -39,4 +39,10 @@ class Sale extends Model
         $itemsTotal = $this->items->sum(fn($item) => $item->subtotal);
         return $itemsTotal - $this->discount + $this->tax;
     }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
+
 }

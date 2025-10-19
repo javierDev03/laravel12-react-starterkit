@@ -14,10 +14,16 @@ interface User {
     name: string;
 }
 
+interface Client {
+    id: number;
+    name: string;
+}
+
 interface Sale {
     id: number;
     branch: Branch;
     user: User;
+    client: Client
     total: number;
     payment_method: string;
     status: string;
@@ -28,6 +34,7 @@ interface PageProps {
     sales: {
         data: Sale[];
     };
+
 }
 
 export default function Index() {
@@ -57,6 +64,7 @@ export default function Index() {
                                     <th className="p-2">#</th>
                                     <th className="p-2">Sucursal</th>
                                     <th className="p-2">Usuario</th>
+                                    <th className="p-2">Cliente</th>
                                     <th className="p-2">Total</th>
                                     <th className="p-2">Método de pago</th>
                                     <th className="p-2">Estado</th>
@@ -69,6 +77,8 @@ export default function Index() {
                                         <td className="p-2">{sale.id}</td>
                                         <td className="p-2">{sale.branch?.name}</td>
                                         <td className="p-2">{sale.user?.name}</td>
+                                        <td className="p-2">{sale.client?.name || 'Consumidor Final'}</td>
+
                                         <td className="p-2">${sale.total.toFixed(2)}</td>
                                         <td className="p-2 capitalize">{sale.payment_method}</td>
                                         <td className="p-2">

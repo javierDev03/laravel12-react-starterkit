@@ -19,12 +19,18 @@ interface Product {
     price?: number;
 }
 
+interface Client {
+    id: number;
+    name: string;
+}
+
 interface FormData {
     items: {
         product_id: number;
         quantity: number;
         price: number;
     }[];
+    client_id: '',
     discount: number;
     tax: number;
     payment_method: string;
@@ -32,11 +38,13 @@ interface FormData {
 
 interface PageProps {
     products: Product[];
+    clients: Client[];
 }
 
-export default function Create({ products }: PageProps) {
+export default function Create({ products, clients }: PageProps) {
     const { data, setData, post, processing } = useForm<FormData>({
         items: [],
+        client_id: '',
         discount: 0,
         tax: 0,
         payment_method: 'cash',
@@ -194,8 +202,28 @@ export default function Create({ products }: PageProps) {
                                 </tbody>
                             </table>
                         )}
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium mb-1">Cliente</label>
+                            <select
+                                name="client_id"
+                                value={data.client_id} // <-- data en vez de form.data
+                                onChange={(e) => setData('client_id', e.target.value)} // <-- setData
+                                className="border rounded p-2 w-full"
+                            >
+                                <option value="">Seleccionar cliente</option>
+                                {clients.map((client) => (
+                                    <option key={client.id} value={client.id}>
+                                        {client.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                        </div>
+
                     </CardContent>
                 </Card>
+
 
                 <Card>
                     <CardHeader>

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // quien realiza la venta
             $table->foreignId('branch_id')->constrained()->cascadeOnDelete(); // sucursal
+            $table->foreignId('client_id')->nullable()->constrained('clients')->nullOnDelete();
             $table->decimal('total', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0); // descuento
             $table->decimal('tax', 12, 2)->default(0);      // impuestos

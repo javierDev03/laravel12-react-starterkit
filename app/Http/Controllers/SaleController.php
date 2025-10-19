@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SaleRequest;
+use App\Models\Client;
 use App\Services\SaleService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -18,12 +19,16 @@ class SaleController extends Controller
 
     public function index()
     {
-        $sales = \App\Models\Sale::with(['items.product', 'user', 'branch'])
+        $sales = \App\Models\Sale::with(['items.product', 'user', 'branch', 'client'])
             ->latest()
             ->paginate(10);
 
+
+        $clients = Client::orderBy('name')->get();
+
         return Inertia::render('sales/Index', [
             'sales' => $sales,
+            'clients' => $clients,
         ]);
     }
 
@@ -40,8 +45,11 @@ class SaleController extends Controller
             }])
             ->get();
 
+        $clients = Client::orderBy('name')->get();
+
         return Inertia::render('sales/Create', [
             'products' => $products,
+            'clients' => $clients,
         ]);
     }
 

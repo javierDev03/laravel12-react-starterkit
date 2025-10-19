@@ -22,6 +22,7 @@ class SaleRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'client_id' => ['required', 'exists:clients,id'],
             'discount' => ['nullable', 'numeric', 'min:0'],
             'tax' => ['nullable', 'numeric', 'min:0'],
             'payment_method' => ['required', 'string'],
@@ -29,6 +30,7 @@ class SaleRequest extends FormRequest
             'items.*.product_id' => ['required', 'exists:products,id'],
             'items.*.quantity' => ['required', 'integer', 'min:1'],
             'items.*.price' => ['required', 'numeric', 'min:0'],
+
         ];
     }
 }
