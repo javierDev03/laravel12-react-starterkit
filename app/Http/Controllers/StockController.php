@@ -27,6 +27,7 @@ class StockController extends Controller
         return Inertia::render('Stock/Index', [
             'stocks' => $stocks ?? [],
             'products' => $products ?? [],
+            'branch' => auth()->user()->branch,
         ]);
     }
 

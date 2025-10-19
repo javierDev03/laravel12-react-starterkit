@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 
 export default function Index() {
-    const { stocks = [], products = [] } = usePage().props as {
+    const { stocks = [], products = [], branch } = usePage().props as {
         stocks: any[];
         products: any[];
+        branch: { id: number; name: string };
     };
 
     return (
@@ -15,7 +16,9 @@ export default function Index() {
             <Head title="Gestión de Stock" />
             <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold">Gestión de Stock</h1>
+                    <h1 className="text-2xl font-semibold">
+                        Gestión de Stock {branch ? `- ${branch.name}` : ''}
+                    </h1>
                     <Link href={route('stock.create')}>
                         <Button>Agregar stock</Button>
                     </Link>

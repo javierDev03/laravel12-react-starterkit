@@ -143,6 +143,14 @@ class MenuSeeder extends Seeder
             'permission_name' => 'products-view',
             'parent_id' => $utilities->id,
         ]);
+        Menu::create([
+            'title' => 'Stock',
+            'icon' => 'Stock',
+            'route' => '/stock',
+            'order' => 6,
+            'permission_name' => 'stocks-view',
+            'parent_id' => $utilities->id,
+        ]);
 
         $permissions = Menu::pluck('permission_name')->unique()->filter();
 

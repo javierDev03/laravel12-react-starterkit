@@ -111,7 +111,6 @@ export default function ProductsIndex() {
                                         <th className="p-2 border-b">SKU</th>
                                         <th className="p-2 border-b">Category</th>
                                         <th className="p-2 border-b">Price</th>
-                                        <th className="p-2 border-b">Stock</th>
                                         <th className="p-2 border-b">Actions</th>
                                     </tr>
                                     </thead>
@@ -122,7 +121,6 @@ export default function ProductsIndex() {
                                             <td className="p-2 border-b">{product.sku || '-'}</td>
                                             <td className="p-2 border-b">{product.category?.name || '-'}</td>
                                             <td className="p-2 border-b">${product.price.toFixed(2)}</td>
-                                            <td className="p-2 border-b">{product.stock}</td>
                                             <td className="p-2 border-b flex gap-2">
                                                 <Link href={`/products/${product.id}/edit`}>
                                                     <Button size="sm">Edit</Button>
@@ -176,48 +174,52 @@ export default function ProductsIndex() {
 
                     {/* Mini CRUD de Categorías */}
                     <div className="w-full md:w-80">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Categories</CardTitle>
-                            </CardHeader>
-                            <Separator />
-                            <CardContent className="pt-5 space-y-4">
-                                {/* Form agregar */}
-                                <form onSubmit={handleAddCategory} className="flex gap-2">
-                                    <Input
-                                        placeholder="New category..."
-                                        value={newCategory}
-                                        onChange={(e) => setNewCategory(e.target.value)}
-                                    />
-                                    <Button type="submit" disabled={categoryLoading}>
-                                        {categoryLoading ? 'Saving...' : 'Add'}
-                                    </Button>
-                                </form>
+                        {/* Mini CRUD de Categorías con scroll */}
+                        <div className="w-full md:w-80">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Categories</CardTitle>
+                                </CardHeader>
+                                <Separator />
+                                <CardContent className="pt-5 space-y-4">
+                                    {/* Form agregar */}
+                                    <form onSubmit={handleAddCategory} className="flex gap-2">
+                                        <Input
+                                            placeholder="New category..."
+                                            value={newCategory}
+                                            onChange={(e) => setNewCategory(e.target.value)}
+                                        />
+                                        <Button type="submit" disabled={categoryLoading}>
+                                            {categoryLoading ? 'Saving...' : 'Add'}
+                                        </Button>
+                                    </form>
 
-                                {/* Lista */}
-                                <ul className="divide-y divide-border border rounded-md">
-                                    {categories.length > 0 ? (
-                                        categories.map((cat) => (
-                                            <li key={cat.id} className="flex justify-between items-center p-2">
-                                                <span>{cat.name}</span>
-                                                <Button
-                                                    size="sm"
-                                                    variant="ghost"
-                                                    className="text-red-500 hover:text-red-600"
-                                                    onClick={() => handleDeleteCategory(cat.id)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <p className="text-muted-foreground text-sm text-center py-4">
-                                            No categories yet
-                                        </p>
-                                    )}
-                                </ul>
-                            </CardContent>
-                        </Card>
+                                    {/* Lista categorías con scroll */}
+                                    <div className="h-96 overflow-y-auto border rounded-md">
+                                        {categories.length > 0 ? (
+                                            categories.map((cat) => (
+                                                <div key={cat.id} className="flex justify-between items-center p-2 border-b last:border-b-0">
+                                                    <span>{cat.name}</span>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        className="text-red-500 hover:text-red-600"
+                                                        onClick={() => handleDeleteCategory(cat.id)}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-muted-foreground text-sm text-center py-4">
+                                                No categories yet
+                                            </p>
+                                        )}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </div>
+
                     </div>
                 </div>
             </AppLayout>
