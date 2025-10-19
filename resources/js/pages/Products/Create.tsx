@@ -26,11 +26,12 @@ export default function CreateProduct({ categories }: CreateProductProps) {
         price: '',
         category_id: '',
         active: true,
+        image: null as File | null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/products', data, { preserveScroll: true });
+        post('/products', data, { preserveScroll: true, forceFormData: true });
     };
 
     return (
@@ -48,6 +49,7 @@ export default function CreateProduct({ categories }: CreateProductProps) {
                         <Separator />
                         <CardContent className="pt-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
+
                                 {/* Nombre */}
                                 <div>
                                     <Label htmlFor="name">Name</Label>
@@ -113,6 +115,22 @@ export default function CreateProduct({ categories }: CreateProductProps) {
                                         placeholder="0.00"
                                     />
                                     {errors.price && <p className="text-sm text-red-500 mt-1">{errors.price}</p>}
+                                </div>
+
+                                {/* Imagen */}
+                                <div>
+                                    <Label htmlFor="image">Image (optional)</Label>
+                                    <Input
+                                        id="image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                setData('image', e.target.files[0]);
+                                            }
+                                        }}
+                                    />
+                                    {errors.image && <p className="text-sm text-red-500 mt-1">{errors.image}</p>}
                                 </div>
 
                                 {/* Activo */}

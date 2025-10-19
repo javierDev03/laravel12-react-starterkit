@@ -18,9 +18,6 @@ class ProductController extends Controller
         $this->service = $service;
     }
 
-    /**
-     * Muestra la lista de productos junto con las categorías.
-     */
     public function index()
     {
         $products = $this->service->getAll();
@@ -32,9 +29,6 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Redirige al index (no usamos vista separada para crear).
-     */
     public function create()
     {
         $categories = Category::orderBy('name')->get();
@@ -44,10 +38,6 @@ class ProductController extends Controller
         ]);
     }
 
-
-    /**
-     * Crea un nuevo producto.
-     */
     public function store(StoreProductRequest $request)
     {
         $this->service->create($request->validated());
@@ -57,18 +47,19 @@ class ProductController extends Controller
             ->with('success', 'Producto creado correctamente.');
     }
 
-    /**
-     * Actualiza un producto existente.
-     */
-
     public function edit(Product $product)
     {
-        $categories = Category::all(); // traer todas las categorías
-        return Inertia::render('Products/Edit', [ // apunta a tu componente React
-            'product' => $product,
+        $categories = Category::all();
+
+        return Inertia::render('Products/Edit', [
+            'product' => [
+                ...$product->toArray(),
+                'image_url' => $product->getFirstMediaUrl('product_images'),
+            ],
             'categories' => $categories,
         ]);
     }
+
     public function update(UpdateProductRequest $request, Product $product)
     {
         $this->service->update($product, $request->validated());
@@ -78,9 +69,6 @@ class ProductController extends Controller
             ->with('success', 'Producto actualizado correctamente.');
     }
 
-    /**
-     * Elimina un producto.
-     */
     public function destroy(Product $product)
     {
         $this->service->delete($product);

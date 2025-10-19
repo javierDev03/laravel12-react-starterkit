@@ -18,10 +18,11 @@ interface Product {
     id: number;
     name: string;
     sku: string;
-    description: string;
+    description?: string;
     price: number;
     category_id: number;
     active: boolean;
+    image_url?: string;
 }
 
 interface EditProductProps {
@@ -29,24 +30,27 @@ interface EditProductProps {
     categories: Category[];
 }
 
-export default function EditProduct({ product, categories }: EditProductProps) {
-    const { data, setData, put, processing, errors } = useForm({
+export default function Edit({ product, categories }: EditProductProps) {
+    const { data, setData, post, processing, errors } = useForm({
+        _method: 'PUT', // 2. Añade esta línea (method spoofing)
         name: product.name,
         sku: product.sku,
         description: product.description || '',
         price: product.price,
         category_id: product.category_id,
         active: product.active,
+        image: null as File | null,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        put(`/products/${product.id}`, data, { preserveScroll: true });
+        // 3. Cambia 'put' por 'post' aquí
+        post(`/products/${product.id}`, data, { preserveScroll: true, forceFormData: true });
     };
 
     return (
         <>
-            <Head title={`Edit Product: ${product.name}`} />
+            <Head title="Edit Product" />
             <AppLayout breadcrumbs={[
                 { title: 'Products', href: '/products' },
                 { title: 'Edit', href: `/products/${product.id}/edit` },
@@ -59,6 +63,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                         <Separator />
                         <CardContent className="pt-6">
                             <form onSubmit={handleSubmit} className="space-y-6">
+
                                 {/* Nombre */}
                                 <div>
                                     <Label htmlFor="name">Name</Label>
@@ -126,6 +131,29 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                                     {errors.price && <p className="text-sm text-red-500 mt-1">{errors.price}</p>}
                                 </div>
 
+                                {/* Imagen */}
+                                <div>
+                                    <Label htmlFor="image">Image (optional)</Label>
+                                    {product.image_url && (
+                                        <img
+                                            src={product.image_url}
+                                            alt={product.name}
+                                            className="w-16 h-16 object-cover rounded mb-2"
+                                        />
+                                    )}
+                                    <Input
+                                        id="image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                            if (e.target.files && e.target.files.length > 0) {
+                                                setData('image', e.target.files[0]);
+                                            }
+                                        }}
+                                    />
+                                    {errors.image && <p className="text-sm text-red-500 mt-1">{errors.image}</p>}
+                                </div>
+
                                 {/* Activo */}
                                 <div className="flex items-center justify-between border p-3 rounded-md">
                                     <Label htmlFor="active">Active</Label>
@@ -142,7 +170,7 @@ export default function EditProduct({ product, categories }: EditProductProps) {
                                         <Button variant="secondary">Cancel</Button>
                                     </Link>
                                     <Button type="submit" disabled={processing}>
-                                        {processing ? 'Saving...' : 'Update'}
+                                        {processing ? 'Saving...' : 'Save'}
                                     </Button>
                                 </div>
                             </form>

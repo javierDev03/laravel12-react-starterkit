@@ -15,6 +15,8 @@ use App\Http\Controllers\SettingAppController;
 use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StockController;
+
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -47,6 +49,9 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::put('/branches/{branch}/toggle-active', [BranchController::class, 'toggleActive']);
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+
+    Route::resource('stock', StockController::class);
+
 });
 
 require __DIR__ . '/settings.php';

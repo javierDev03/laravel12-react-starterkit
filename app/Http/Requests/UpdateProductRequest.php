@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateProductRequest extends FormRequest
 {
@@ -11,24 +12,34 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        return true; // Puedes personalizar según permisos
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * Esta versión permite actualizar solo los campos enviados,
+     * haciendo que la imagen sea opcional y validando los demás
+     * campos solo si están presentes en la solicitud.
      */
     public function rules(): array
     {
+        $productId = $this->route('product')->id ?? null;
+
         return [
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'sku' => 'required|string|max:100|unique:products,sku,' . $this->route('product')->id,
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'active' => 'required|boolean',
+            'name' => 'sometimes|required|string|max:255',
+            'sku' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('products', 'sku')->ignore($productId),
+            ],
+            'description' => 'sometimes|nullable|string',
+            'price' => 'sometimes|required|numeric|min:0',
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'active' => 'sometimes|required|boolean',
+            'image' => 'sometimes|nullable|image|max:2048', // 2MB máximo
         ];
     }
-
 }
