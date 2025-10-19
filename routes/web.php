@@ -16,6 +16,8 @@ use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SaleController;
+
 
 
 Route::get('/', function () {
@@ -49,7 +51,7 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::put('/branches/{branch}/toggle-active', [BranchController::class, 'toggleActive']);
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
-
+    Route::resource('sales', SaleController::class)->only(['index', 'create', 'store']);
     Route::resource('stock', StockController::class);
 
 });
