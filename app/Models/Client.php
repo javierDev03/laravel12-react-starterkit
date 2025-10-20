@@ -24,5 +24,11 @@ class Client extends Model
         'billing_email', // Correo de facturación
         'requires_invoice', // Cliente quiere factura
         'fiscal_data_completed', // Datos fiscales completos
+        'branch_id'
     ];
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }

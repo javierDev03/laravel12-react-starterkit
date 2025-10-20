@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SaleRequest;
 use App\Models\Client;
+use App\Models\Product;
 use App\Services\SaleService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+
 
 class SaleController extends Controller
 {
@@ -36,7 +38,8 @@ class SaleController extends Controller
     {
         $user = auth()->user();
 
-        $products = \App\Models\Product::whereHas('stocks', function ($query) use ($user) {
+        // Productos filtrados por stock en la sucursal
+        $products = Product::whereHas('stocks', function ($query) use ($user) {
             $query->where('branch_id', $user->branch_id)
                 ->where('quantity', '>', 0);
         })
@@ -45,13 +48,17 @@ class SaleController extends Controller
             }])
             ->get();
 
-        $clients = Client::orderBy('name')->get();
+        // Clientes filtrados por sucursal del usuario
+        $clients = Client::where('branch_id', $user->branch_id)
+            ->orderBy('name')
+            ->get();
 
         return Inertia::render('sales/Create', [
             'products' => $products,
             'clients' => $clients,
         ]);
     }
+
 
     public function store(SaleRequest $request)
     {

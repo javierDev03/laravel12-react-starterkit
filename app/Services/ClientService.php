@@ -15,18 +15,22 @@ class ClientService
     // Create a new client
     public function create(array $data): Client
     {
-        $data['fiscal_data_completed'] = $data['requires_invoice'] 
-            ? $this->checkFiscalData($data) 
+        // Asignamos la sucursal del usuario que está creando el cliente
+        $data['branch_id'] = auth()->user()->branch_id;
+
+        $data['fiscal_data_completed'] = $data['requires_invoice']
+            ? $this->checkFiscalData($data)
             : false;
 
         return Client::create($data);
     }
 
+
     // Update an existing client
     public function update(Client $client, array $data): Client
     {
-        $data['fiscal_data_completed'] = $data['requires_invoice'] 
-            ? $this->checkFiscalData($data) 
+        $data['fiscal_data_completed'] = $data['requires_invoice']
+            ? $this->checkFiscalData($data)
             : false;
 
         $client->update($data);
