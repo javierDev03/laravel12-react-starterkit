@@ -53,6 +53,9 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('sales', SaleController::class)->only(['index', 'create', 'store']);
     Route::resource('stock', StockController::class);
+    Route::get('/search-products', [ProductController::class, 'searchProducts']);
+
+
 
 });
 

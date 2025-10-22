@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\Stock;
 use Illuminate\Support\Facades\DB;
+
 
 class SaleService
 {
@@ -57,4 +59,8 @@ class SaleService
             return $sale;
         });
     }
+
+
+
+
 }

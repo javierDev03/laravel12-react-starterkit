@@ -71,4 +71,17 @@ class SaleController extends Controller
         return redirect()->route('sales.index')
             ->with('success', 'Venta registrada correctamente.');
     }
+
+    public function searchProducts(Request $request)
+    {
+        $query = $request->input('query', '');
+        $branchId = auth()->user()->branch_id;
+
+        $products = $this->saleService->searchProducts($query, $branchId);
+
+        return response()->json($products);
+    }
+
+
+
 }
