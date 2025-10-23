@@ -120,4 +120,32 @@ class ProductController extends Controller
         return response()->json($products);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->get('query', '');
+
+        $products = Product::with('category')
+            ->when($query, function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('sku', 'like', "%{$query}%");
+            })
+            ->orderBy('name')
+            ->paginate(10)
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'price' => $product->price,
+                    'category' => $product->category ? $product->category->name : null,
+                ];
+            });
+
+        return response()->json([
+            'data' => $products,
+        ]);
+    }
+
+
+
 }

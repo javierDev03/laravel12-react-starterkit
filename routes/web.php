@@ -50,10 +50,13 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
     Route::resource('branches', BranchController::class);
     Route::put('/branches/{branch}/toggle-active', [BranchController::class, 'toggleActive']);
     Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class)->except(['show']);
     Route::resource('sales', SaleController::class)->only(['index', 'create', 'store']);
     Route::resource('stock', StockController::class);
     Route::get('/search-products', [ProductController::class, 'searchProducts']);
+    Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+
+
 
 
 

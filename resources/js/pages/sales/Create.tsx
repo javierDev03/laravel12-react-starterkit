@@ -162,6 +162,60 @@ export default function Create({ products, clients, currentBranchId }: PageProps
                     </Link>
                 </div>
 
+                {/* --- Buscador global (el nuevo) --- */}
+                <div className="mt-4">
+                    <Label>Buscar productos (global)</Label>
+                    <Input
+                        type="text"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Nombre o SKU en todas las sucursales"
+                    />
+                    {loading && <p className="text-sm text-gray-500 mt-2">Buscando...</p>}
+
+                    {results.length > 0 && (
+                        <table className="w-full border mt-2">
+                            <thead>
+                            <tr className="border-b">
+                                <th className="p-2 text-left">Producto</th>
+                                <th className="p-2 text-left">SKU</th>
+                                <th className="p-2 text-left">Disponibilidad</th>
+                                <th className="p-2 text-left">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {results.map((product) => (
+                                <tr key={product.id} className="border-b hover:bg-gray-50">
+                                    <td className="p-2">{product.name}</td>
+                                    <td className="p-2">{product.sku}</td>
+                                    <td className="p-2">
+                                        {product.stocks.reduce((acc, s) => acc + s.quantity, 0) > 0
+                                            ? `En ${product.stocks.filter(s => s.quantity > 0).length} sucursal(es)`
+                                            : 'Sin stock'}
+                                    </td>
+                                    <td className="p-2 flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => showBranchDetails(product)}
+                                        >
+                                            Ver Detalles
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            onClick={() => addItem(product)}
+                                        >
+                                            Agregar
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
                 {/* ======= Sección de agregar productos ======= */}
                 <Card>
                     <CardHeader>
@@ -225,60 +279,7 @@ export default function Create({ products, clients, currentBranchId }: PageProps
                             </Button>
                         </div>
 
-                        {/* --- Buscador global (el nuevo) --- */}
-                        <div className="mt-4">
-                            <Label>Buscar productos (global)</Label>
-                            <Input
-                                type="text"
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Nombre o SKU en todas las sucursales"
-                            />
-                            {loading && <p className="text-sm text-gray-500 mt-2">Buscando...</p>}
 
-                            {results.length > 0 && (
-                                <table className="w-full border mt-2">
-                                    <thead>
-                                    <tr className="border-b">
-                                        <th className="p-2 text-left">Producto</th>
-                                        <th className="p-2 text-left">SKU</th>
-                                        <th className="p-2 text-left">Disponibilidad</th>
-                                        <th className="p-2 text-left">Acciones</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {results.map((product) => (
-                                        <tr key={product.id} className="border-b hover:bg-gray-50">
-                                            <td className="p-2">{product.name}</td>
-                                            <td className="p-2">{product.sku}</td>
-                                            <td className="p-2">
-                                                {product.stocks.reduce((acc, s) => acc + s.quantity, 0) > 0
-                                                    ? `En ${product.stocks.filter(s => s.quantity > 0).length} sucursal(es)`
-                                                    : 'Sin stock'}
-                                            </td>
-                                            <td className="p-2 flex gap-2">
-                                                <Button
-                                                    type="button"
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => showBranchDetails(product)}
-                                                >
-                                                    Ver Detalles
-                                                </Button>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    onClick={() => addItem(product)}
-                                                >
-                                                    Agregar
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
-                            )}
-                        </div>
 
                         {/* --- Tabla de productos agregados (común para ambos) --- */}
                         {data.items.length > 0 && (
@@ -346,12 +347,6 @@ export default function Create({ products, clients, currentBranchId }: PageProps
                                     <SelectValue placeholder="Seleccionar cliente" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {/* 2. ¡IMPORTANTE!
-              Asegúrate de NO tener una línea como:
-              <SelectItem value="">Seleccionar cliente</SelectItem>
-              Aquí dentro.
-            */}
-
                                     {/* El map de tus clientes está perfecto así: */}
                                     {clients.map((client) => (
                                         <SelectItem key={client.id} value={String(client.id)}>

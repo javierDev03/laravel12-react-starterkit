@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { Inertia } from '@inertiajs/inertia';
+import { Inertia,  } from '@inertiajs/inertia';
+import { router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,6 @@ import { Separator } from '@/components/ui/separator';
 import { Head } from '@inertiajs/react';
 import {
     AlertDialog,
-    AlertDialogTrigger,
     AlertDialogContent,
     AlertDialogHeader,
     AlertDialogTitle,
@@ -31,16 +31,19 @@ interface Product {
     name: string;
     sku?: string;
     price: number;
-    stock: number;
+    stock?: number;
     category?: Category;
 }
 
+// <-- AÑADIDO: Interfaz para el objeto de paginación
+interface PaginatedProducts {
+    data: Product[];
+    prev_page_url?: string | null;
+    next_page_url?: string | null;
+}
+
 interface ProductsPageProps {
-    products: {
-        data: Product[];
-        prev_page_url?: string | null;
-        next_page_url?: string | null;
-    };
+    products: PaginatedProducts; // <-- USADO: Reutilizamos la interfaz
     categories: Category[];
 }
 
@@ -51,9 +54,37 @@ export default function ProductsIndex() {
     const [productToDelete, setProductToDelete] = React.useState<Product | null>(null);
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
 
-    // Estados para categorías (mini CRUD)
+    // Estados para categorías
     const [newCategory, setNewCategory] = React.useState('');
     const [categoryLoading, setCategoryLoading] = React.useState(false);
+
+    // Búsqueda
+    const [searchQuery, setSearchQuery] = React.useState('');
+    // <-- CORREGIDO: El estado guarda el objeto paginado completo, no solo el array
+    const [searchResults, setSearchResults] = React.useState<PaginatedProducts>(products);
+
+    const handleSearch = async (query: string) => {
+        setSearchQuery(query);
+
+        if (!query.trim()) {
+            setSearchResults(products); // <-- CORREGIDO: Resetea al objeto 'products' original
+            return;
+        }
+
+        try {
+            const response = await fetch(`/products/search?query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            setSearchResults(data); // <-- CORREGIDO: Guarda el objeto de paginación completo
+        } catch (error) {
+            console.error('Error fetching products:', error);
+        }
+    };
+
+    // <-- AÑADIDO: Función para manejar la paginación
+    const handlePaginate = (page: number) => {
+        router.get('/products', { page }, { preserveState: true });
+    };
+
 
     const openDeleteProductDialog = (product: Product) => {
         setProductToDelete(product);
@@ -68,9 +99,10 @@ export default function ProductsIndex() {
         }
     };
 
-    const handleAddCategory = async (e: React.FormEvent) => {
+    const handleAddCategory = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newCategory.trim()) return;
+
         setCategoryLoading(true);
         Inertia.post('/categories', { name: newCategory }, {
             onFinish: () => {
@@ -98,7 +130,18 @@ export default function ProductsIndex() {
                             </CardHeader>
                             <Separator />
                             <CardContent className="pt-5">
-                                <div className="flex justify-end mb-4">
+                                <div className="flex flex-col md:flex-row justify-between mb-4 gap-2">
+                                    {/* Buscador */}
+                                    <div className="flex items-center gap-2 w-full md:w-1/3">
+                                        <Input
+                                            type="text"
+                                            placeholder="Buscar por nombre o SKU..."
+                                            value={searchQuery}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                        />
+                                    </div>
+
+                                    {/* Botón crear */}
                                     <Link href="/products/create">
                                         <Button>Create Product</Button>
                                     </Link>
@@ -115,7 +158,8 @@ export default function ProductsIndex() {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {products.data.map((product) => (
+                                    {/* <-- CORREGIDO: Mapear sobre .data */}
+                                    {searchResults.data.map((product) => (
                                         <tr key={product.id}>
                                             <td className="p-2 border-b">{product.name}</td>
                                             <td className="p-2 border-b">{product.sku || '-'}</td>
@@ -136,17 +180,19 @@ export default function ProductsIndex() {
                                         </tr>
                                     ))}
                                     </tbody>
+
                                 </table>
 
-                                {/* Paginación */}
                                 <div className="mt-4 flex justify-end gap-2">
                                     {products.prev_page_url && (
-                                        <Button onClick={() => Inertia.get(products.prev_page_url!)}>Prev</Button>
+                                        <Button onClick={() => handlePaginate(products.current_page - 1)}>Prev</Button>
                                     )}
                                     {products.next_page_url && (
-                                        <Button onClick={() => Inertia.get(products.next_page_url!)}>Next</Button>
+                                        <Button onClick={() => handlePaginate(products.current_page + 1)}>Next</Button>
                                     )}
                                 </div>
+
+
 
                                 {/* Diálogo de eliminación */}
                                 <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
@@ -174,52 +220,48 @@ export default function ProductsIndex() {
 
                     {/* Mini CRUD de Categorías */}
                     <div className="w-full md:w-80">
-                        {/* Mini CRUD de Categorías con scroll */}
-                        <div className="w-full md:w-80">
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle>Categories</CardTitle>
-                                </CardHeader>
-                                <Separator />
-                                <CardContent className="pt-5 space-y-4">
-                                    {/* Form agregar */}
-                                    <form onSubmit={handleAddCategory} className="flex gap-2">
-                                        <Input
-                                            placeholder="New category..."
-                                            value={newCategory}
-                                            onChange={(e) => setNewCategory(e.target.value)}
-                                        />
-                                        <Button type="submit" disabled={categoryLoading}>
-                                            {categoryLoading ? 'Saving...' : 'Add'}
-                                        </Button>
-                                    </form>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Categories</CardTitle>
+                            </CardHeader>
+                            <Separator />
+                            <CardContent className="pt-5 space-y-4">
+                                {/* Form agregar */}
+                                <form onSubmit={handleAddCategory} className="flex gap-2">
+                                    <Input
+                                        placeholder="New category..."
+                                        value={newCategory}
+                                        onChange={(e) => setNewCategory(e.target.value)}
+                                    />
+                                    <Button type="submit" disabled={categoryLoading}>
+                                        {categoryLoading ? 'Saving...' : 'Add'}
+                                    </Button>
+                                </form>
 
-                                    {/* Lista categorías con scroll */}
-                                    <div className="h-96 overflow-y-auto border rounded-md">
-                                        {categories.length > 0 ? (
-                                            categories.map((cat) => (
-                                                <div key={cat.id} className="flex justify-between items-center p-2 border-b last:border-b-0">
-                                                    <span>{cat.name}</span>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        className="text-red-500 hover:text-red-600"
-                                                        onClick={() => handleDeleteCategory(cat.id)}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p className="text-muted-foreground text-sm text-center py-4">
-                                                No categories yet
-                                            </p>
-                                        )}
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
+                                {/* Lista categorías con scroll */}
+                                <div className="h-96 overflow-y-auto border rounded-md">
+                                    {categories.length > 0 ? (
+                                        categories.map((cat) => (
+                                            <div key={cat.id} className="flex justify-between items-center p-2 border-b last:border-b-0">
+                                                <span>{cat.name}</span>
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    className="text-red-500 hover:text-red-600"
+                                                    onClick={() => handleDeleteCategory(cat.id)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <p className="text-muted-foreground text-sm text-center py-4">
+                                            No categories yet
+                                        </p>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </AppLayout>
