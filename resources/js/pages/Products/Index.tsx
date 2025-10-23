@@ -163,7 +163,7 @@ export default function ProductsIndex() {
                                         <tr key={product.id}>
                                             <td className="p-2 border-b">{product.name}</td>
                                             <td className="p-2 border-b">{product.sku || '-'}</td>
-                                            <td className="p-2 border-b">{product.category?.name || '-'}</td>
+                                            {typeof product.category === 'object' ? product.category?.name : product.category || '-'}
                                             <td className="p-2 border-b">${product.price.toFixed(2)}</td>
                                             <td className="p-2 border-b flex gap-2">
                                                 <Link href={`/products/${product.id}/edit`}>
