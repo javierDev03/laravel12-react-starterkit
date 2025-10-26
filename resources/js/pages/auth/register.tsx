@@ -14,6 +14,9 @@ interface RegisterForm {
     email: string;
     password: string;
     password_confirmation: string;
+    clinic_name: string;
+    clinic_address: string;
+    clinic_phone: string;
 }
 
 export default function Register() {
@@ -22,6 +25,9 @@ export default function Register() {
         email: '',
         password: '',
         password_confirmation: '',
+        clinic_name: '',
+        clinic_address: '',
+        clinic_phone: '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -36,6 +42,7 @@ export default function Register() {
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
+                    {/* Usuario */}
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
@@ -43,8 +50,6 @@ export default function Register() {
                             type="text"
                             required
                             autoFocus
-                            tabIndex={1}
-                            autoComplete="name"
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
@@ -54,13 +59,11 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                        <Label htmlFor="email">Email</Label>
                         <Input
                             id="email"
                             type="email"
                             required
-                            tabIndex={2}
-                            autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
@@ -75,8 +78,6 @@ export default function Register() {
                             id="password"
                             type="password"
                             required
-                            tabIndex={3}
-                            autoComplete="new-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             disabled={processing}
@@ -91,8 +92,6 @@ export default function Register() {
                             id="password_confirmation"
                             type="password"
                             required
-                            tabIndex={4}
-                            autoComplete="new-password"
                             value={data.password_confirmation}
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                             disabled={processing}
@@ -101,7 +100,50 @@ export default function Register() {
                         <InputError message={errors.password_confirmation} />
                     </div>
 
-                    <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
+                    {/* Clínica */}
+                    <div className="grid gap-2">
+                        <Label htmlFor="clinic_name">Clinic Name</Label>
+                        <Input
+                            id="clinic_name"
+                            type="text"
+                            required
+                            value={data.clinic_name}
+                            onChange={(e) => setData('clinic_name', e.target.value)}
+                            disabled={processing}
+                            placeholder="Clinic name"
+                        />
+                        <InputError message={errors.clinic_name} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="clinic_address">Clinic Address</Label>
+                        <Input
+                            id="clinic_address"
+                            type="text"
+                            required
+                            value={data.clinic_address}
+                            onChange={(e) => setData('clinic_address', e.target.value)}
+                            disabled={processing}
+                            placeholder="Clinic address"
+                        />
+                        <InputError message={errors.clinic_address} />
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="clinic_phone">Clinic Phone</Label>
+                        <Input
+                            id="clinic_phone"
+                            type="text"
+                            required
+                            value={data.clinic_phone}
+                            onChange={(e) => setData('clinic_phone', e.target.value)}
+                            disabled={processing}
+                            placeholder="Clinic phone"
+                        />
+                        <InputError message={errors.clinic_phone} />
+                    </div>
+
+                    <Button type="submit" className="mt-2 w-full" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Create account
                     </Button>
@@ -109,9 +151,7 @@ export default function Register() {
 
                 <div className="text-muted-foreground text-center text-sm">
                     Already have an account?{' '}
-                    <TextLink href={route('login')} tabIndex={6}>
-                        Log in
-                    </TextLink>
+                    <TextLink href={route('login')}>Log in</TextLink>
                 </div>
             </form>
         </AuthLayout>
