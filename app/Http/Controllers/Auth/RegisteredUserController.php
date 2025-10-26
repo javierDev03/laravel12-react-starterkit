@@ -59,7 +59,7 @@ class RegisteredUserController extends Controller
         ]);
 
         // Asignar rol por defecto
-        $user->assignRole(Role::where('name', 'user')->first());
+        $user->assignRole(Role::where('name', 'doctor')->first());
 
         event(new Registered($user));
 
