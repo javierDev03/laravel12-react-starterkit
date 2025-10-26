@@ -46,20 +46,16 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $group => $perms) {
             foreach ($perms as $name) {
-                // Creamos el permiso si no existe
+                
                 $permission = Permission::firstOrCreate([
                     'name' => $name,
                     'group' => $group,
                 ]);
 
-                // Asignamos permisos al admin
                 if (! $admin->hasPermissionTo($permission)) {
                     $admin->givePermissionTo($permission);
                 }
 
-                // Asignamos permisos al doctor
-                // Aquí puedes personalizar qué permisos recibe el doctor
-                // Por ejemplo, solo algunos:
                 $doctorPermissions = [
                     'access-view',
                     'dashboard-view',
