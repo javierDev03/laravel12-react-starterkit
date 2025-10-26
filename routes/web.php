@@ -14,9 +14,13 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\SettingAppController;
 use App\Http\Controllers\MediaFolderController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DoctorRoleController;
+use App\Http\Controllers\DoctorUserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SaleController;
+use App\Models\Role; // tu modelo personalizado que extiende SpatieRole
+
 
 
 
@@ -61,6 +65,15 @@ Route::middleware(['auth', 'menu.permission'])->group(function () {
 
 
 });
+
+Route::prefix('doctor')
+    ->name('doctor.')
+    ->middleware(['auth', 'role:doctor'])
+    ->group(function () {
+        Route::resource('users', DoctorUserController::class);
+        Route::resource('roles', DoctorRoleController::class);
+    });
+
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

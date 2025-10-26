@@ -10,12 +10,11 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Creamos roles si no existen
+
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $doctor = Role::firstOrCreate(['name' => 'doctor']);
         $user = Role::firstOrCreate(['name' => 'user']);
 
-        // Permisos agrupados por sección/menu
         $permissions = [
             'Dashboard' => [
                 'dashboard-view',
@@ -24,6 +23,8 @@ class RolePermissionSeeder extends Seeder
                 'access-view',
                 'permission-view',
                 'users-view',
+                'roles-create',
+                'users-create',
                 'roles-view',
                 'clients-view',
                 'branches-view',
@@ -46,7 +47,7 @@ class RolePermissionSeeder extends Seeder
 
         foreach ($permissions as $group => $perms) {
             foreach ($perms as $name) {
-                
+
                 $permission = Permission::firstOrCreate([
                     'name' => $name,
                     'group' => $group,
@@ -59,9 +60,11 @@ class RolePermissionSeeder extends Seeder
                 $doctorPermissions = [
                     'access-view',
                     'dashboard-view',
-                    'permission-view',
-                    'users-view',
+                    'clients-view',
+                    'sales-view',
                     'roles-view',
+                    'roles-create',
+                    'users-view',
                 ];
 
                 if (in_array($name, $doctorPermissions) && ! $doctor->hasPermissionTo($permission)) {

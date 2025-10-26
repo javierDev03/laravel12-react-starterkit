@@ -160,11 +160,11 @@ class MenuSeeder extends Seeder
             'parent_id' => $utilities->id,
         ]);
 
-        // $permissions = Menu::pluck('permission_name')->unique()->filter();
+         $permissions = Menu::pluck('permission_name')->unique()->filter();
 
-        // foreach ($permissions as $permName) {
-        //     Permission::firstOrCreate(['name' => $permName]);
-        // }
+         foreach ($permissions as $permName) {
+            Permission::firstOrCreate(['name' => $permName]);
+         }
 
         // $role = Role::firstOrCreate(['name' => 'user']);
         // $role->givePermissionTo('dashboard-view');

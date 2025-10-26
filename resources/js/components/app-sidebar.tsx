@@ -33,62 +33,61 @@ function RenderMenu({ items, level = 0 }: { items: MenuItem[]; level?: number })
 
   return (
     <>
-      {items.map((menu) => {
-        if (!menu) return null;
-        const Icon = iconMapper(menu.icon || 'Folder') as LucideIcon;
-        const children = Array.isArray(menu.children) ? menu.children.filter(Boolean) : [];
-        const hasChildren = children.length > 0;
-        const isActive = menu.route && currentUrl.startsWith(menu.route);
-        const indentClass = level > 0 ? `pl-${4 + level * 3}` : '';
-        
-        const activeClass = isActive
-          ? 'bg-primary/10 text-primary font-medium'
-          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground';
+     {items.map((menu, index) => {
+  if (!menu) return null;
+  const key = menu.id ?? `${menu.title}-${level}-${index}`;
+  const Icon = iconMapper(menu.icon || 'Folder') as LucideIcon;
+  const children = Array.isArray(menu.children) ? menu.children.filter(Boolean) : [];
+  const hasChildren = children.length > 0;
+  const isActive = menu.route && currentUrl.startsWith(menu.route);
+  const indentClass = level > 0 ? `pl-${4 + level * 3}` : '';
+  const activeClass = isActive
+    ? 'bg-primary/10 text-primary font-medium'
+    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground';
 
-        if (!menu.route && !hasChildren) return null;
+  if (!menu.route && !hasChildren) return null;
 
-        return (
-          <SidebarMenuItem key={menu.id}>
-            {hasChildren ? (
-              <>
-                <SidebarMenuButton 
-                  className={cn(
-                    `group flex items-center justify-between rounded-md transition-colors ${indentClass}`,
-                    activeClass,
-                    level === 0 ? 'py-3 px-4 my-1' : 'py-2 px-3'
-                  )}
-                >
-                  <div className="flex items-center">
-                    <Icon className="size-4 mr-3 opacity-80 group-hover:opacity-100" />
-                    <span>{menu.title}</span>
-                  </div>
-                  <ChevronDown className="size-4 opacity-50 group-hover:opacity-70 transition-transform group-data-[state=open]:rotate-180" />
-                </SidebarMenuButton>
-                <SidebarMenu className="ml-2 border-l border-muted pl-2">
-                  <RenderMenu items={children} level={level + 1} />
-                </SidebarMenu>
-              </>
-            ) : (
-              <SidebarMenuButton 
-                asChild 
-                className={cn(
-                  `group flex items-center rounded-md transition-colors ${indentClass}`,
-                  activeClass,
-                  level === 0 ? 'py-3 px-4 my-1' : 'py-2 px-3'
-                )}
-              >
-                <Link href={menu.route || '#'}>
-                  <Icon className="size-4 mr-3 opacity-80 group-hover:opacity-100" />
-                  <span>{menu.title}</span>
-                  {level > 0 && (
-                    <ChevronRight className="ml-auto size-4 opacity-0 group-hover:opacity-50" />
-                  )}
-                </Link>
-              </SidebarMenuButton>
+  return (
+    <SidebarMenuItem key={key}>
+      {hasChildren ? (
+        <>
+          <SidebarMenuButton 
+            className={cn(
+              `group flex items-center justify-between rounded-md transition-colors ${indentClass}`,
+              activeClass,
+              level === 0 ? 'py-3 px-4 my-1' : 'py-2 px-3'
             )}
-          </SidebarMenuItem>
-        );
-      })}
+          >
+            <div className="flex items-center">
+              <Icon className="size-4 mr-3 opacity-80 group-hover:opacity-100" />
+              <span>{menu.title}</span>
+            </div>
+            <ChevronDown className="size-4 opacity-50 group-hover:opacity-70 transition-transform group-data-[state=open]:rotate-180" />
+          </SidebarMenuButton>
+          <SidebarMenu className="ml-2 border-l border-muted pl-2">
+            <RenderMenu items={children} level={level + 1} />
+          </SidebarMenu>
+        </>
+      ) : (
+        <SidebarMenuButton 
+          asChild 
+          className={cn(
+            `group flex items-center rounded-md transition-colors ${indentClass}`,
+            activeClass,
+            level === 0 ? 'py-3 px-4 my-1' : 'py-2 px-3'
+          )}
+        >
+          <Link href={menu.route || '#'}>
+            <Icon className="size-4 mr-3 opacity-80 group-hover:opacity-100" />
+            <span>{menu.title}</span>
+            {level > 0 && <ChevronRight className="ml-auto size-4 opacity-0 group-hover:opacity-50" />}
+          </Link>
+        </SidebarMenuButton>
+      )}
+    </SidebarMenuItem>
+  );
+})}
+
     </>
   );
 }
