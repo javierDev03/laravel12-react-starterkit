@@ -10,58 +10,47 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ShareMenus
 {
-   public function handle(Request $request, Closure $next): Response
-{
-    $user = $request->user();
+    public function handle(Request $request, Closure $next): Response
+    {
+        $user = $request->user();
 
-    Inertia::share('menus', function () use ($user) {
-        if (!$user) return [];
+        Inertia::share('menus', function () use ($user) {
+            if (!$user) {
+                return [];
+            }
 
-        // Si es Doctor, solo mostramos su mini-panel
-        if ($user->hasRole('doctor')) {
-            return [
-                (object)[
-                    'title' => 'Dashboard',
-                    'route' => route('dashboard'),
-                    'children' => [],
-                ],
-                (object)[
-                    'title' => 'Roles',
-                    'route' => route('doctor.roles.index'),
-                    'children' => [],
-                ],
-                (object)[
-                    'title' => 'Usuarios',
-                    'route' => route('doctor.users.index'),
-                    'children' => [],
-                ],
-            ];
-        }
+            // Obtenemos todos los menús ordenados
+            $menus = Menu::orderBy('order')->get();
+            $indexed = $menus->keyBy('id');
 
-        // Para todos los demás (Admin, etc.) usamos el menú completo filtrado por permisos
-        $allMenus = Menu::orderBy('order')->get();
-        $indexed = $allMenus->keyBy('id');
+            // Función recursiva para construir el árbol
+            $buildTree = function ($parentId = null) use (&$buildTree, $indexed, $user) {
+                return $indexed
+                    ->filter(function ($menu) use ($parentId, $user) {
+                        return $menu->parent_id === $parentId
+                            && (!$menu->permission_name || $user->can($menu->permission_name));
+                    })
+                    ->map(function ($menu) use (&$buildTree, $user) {
+                        // 🚨 Excepción: si es doctor, cambiar rutas específicas
+                        if ($user->hasRole('doctor')) {
+                            if ($menu->route === '/users') {
+                                $menu->route = '/doctor/users';
+                            } elseif ($menu->route === '/roles') {
+                                $menu->route = '/doctor/roles';
+                            }
+                        }
 
-        $buildTree = function ($parentId = null) use (&$buildTree, $indexed, $user) {
-            return $indexed
-                ->filter(fn($menu) =>
-                    $menu->parent_id === $parentId &&
-                    (!$menu->permission_name || $user->can($menu->permission_name))
-                )
-                ->map(function ($menu) use (&$buildTree) {
-                    $menu->children = $buildTree($menu->id)->values();
-                    return $menu;
-                })
-                ->filter(fn($menu) =>
-                    $menu->route || $menu->children->isNotEmpty()
-                )
-                ->values();
-        };
+                        // Construimos hijos
+                        $menu->children = $buildTree($menu->id)->values();
+                        return $menu;
+                    })
+                    ->filter(fn($menu) => $menu->route || $menu->children->isNotEmpty())
+                    ->values();
+            };
 
-        return $buildTree();
-    });
+            return $buildTree();
+        });
 
-    return $next($request);
-}
-
+        return $next($request);
+    }
 }
