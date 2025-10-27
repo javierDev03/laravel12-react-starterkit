@@ -15,8 +15,8 @@ class ClientService
     // Create a new client
     public function create(array $data): Client
     {
-        // Asignamos la sucursal del usuario que está creando el cliente
-        $data['branch_id'] = auth()->user()->branch_id;
+        // Asignamos la clínica del usuario que está creando el cliente
+        $data['clinic_id'] = auth()->user()->clinic_id;
 
         $data['fiscal_data_completed'] = $data['requires_invoice']
             ? $this->checkFiscalData($data)

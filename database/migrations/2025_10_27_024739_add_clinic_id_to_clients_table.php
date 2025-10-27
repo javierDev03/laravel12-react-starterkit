@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->unsignedBigInteger('clinic_id')->after('id');
+            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('clients', function (Blueprint $table) {
-            Schema::dropIfExists('clients');
+            $table->dropForeign(['clinic_id']);
+            $table->dropColumn('clinic_id');
         });
     }
 };

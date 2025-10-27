@@ -65,6 +65,7 @@ class RolePermissionSeeder extends Seeder
                     'roles-view',
                     'roles-create',
                     'users-view',
+                    'utilities-view'
                 ];
 
                 if (in_array($name, $doctorPermissions) && ! $doctor->hasPermissionTo($permission)) {

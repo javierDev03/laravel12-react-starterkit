@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Client extends Model
 {
@@ -24,11 +26,20 @@ class Client extends Model
         'billing_email', // Correo de facturación
         'requires_invoice', // Cliente quiere factura
         'fiscal_data_completed', // Datos fiscales completos
-        'branch_id'
+        'clinic_id', // ID de la clínica (sucursal)
     ];
 
-    public function branch()
+    public function clinic()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(Clinic::class);
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope('clinic', function (Builder $builder) {
+            if ($user = Auth::user()) {
+                $builder->where('clinic_id', $user->clinic_id);
+            }
+        });
     }
 }

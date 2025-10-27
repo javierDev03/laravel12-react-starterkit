@@ -18,7 +18,10 @@ class ClientController extends Controller
 
     // List clients
     public function index()
+
+    
     {
+        
         $clients = $this->service->list(10);
         return inertia('Clients/Index', [
             'clients' => $clients
