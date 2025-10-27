@@ -1,7 +1,7 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
 import { Link, usePage } from '@inertiajs/react';
 import { Inertia,  } from '@inertiajs/inertia';
-import { router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -92,19 +92,29 @@ export default function ProductsIndex() {
     };
 
     const handleDeleteProduct = () => {
-        if (productToDelete) {
-            Inertia.delete(`/products/${productToDelete.id}`);
+    if (!productToDelete) return;
+
+    router.delete(`/products/${productToDelete.id}`, {
+        onSuccess: () => {
+            // Actualizamos el estado eliminando el producto
+            setSearchResults((prev) => ({
+                ...prev,
+                data: prev.data.filter(p => p.id !== productToDelete.id),
+            }));
+
             setOpenDeleteDialog(false);
             setProductToDelete(null);
-        }
-    };
+        },
+    });
+};
+
 
     const handleAddCategory = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newCategory.trim()) return;
 
         setCategoryLoading(true);
-        Inertia.post('/categories', { name: newCategory }, {
+        router.post('/categories', { name: newCategory }, {
             onFinish: () => {
                 setNewCategory('');
                 setCategoryLoading(false);
@@ -113,7 +123,7 @@ export default function ProductsIndex() {
     };
 
     const handleDeleteCategory = (id: number) => {
-        Inertia.delete(`/categories/${id}`);
+        router.delete(`/categories/${id}`);
     };
 
     return (
@@ -148,40 +158,43 @@ export default function ProductsIndex() {
                                 </div>
 
                                 <table className="w-full table-auto border border-border">
-                                    <thead>
-                                    <tr className="bg-muted text-left">
-                                        <th className="p-2 border-b">Name</th>
-                                        <th className="p-2 border-b">SKU</th>
-                                        <th className="p-2 border-b">Category</th>
-                                        <th className="p-2 border-b">Price</th>
-                                        <th className="p-2 border-b">Actions</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {/* <-- CORREGIDO: Mapear sobre .data */}
-                                    {searchResults.data.map((product) => (
-                                        <tr key={product.id}>
-                                            <td className="p-2 border-b">{product.name}</td>
-                                            <td className="p-2 border-b">{product.sku || '-'}</td>
-                                            {typeof product.category === 'object' ? product.category?.name : product.category || '-'}
-                                            <td className="p-2 border-b">${product.price.toFixed(2)}</td>
-                                            <td className="p-2 border-b flex gap-2">
-                                                <Link href={`/products/${product.id}/edit`}>
-                                                    <Button size="sm">Edit</Button>
-                                                </Link>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    onClick={() => openDeleteProductDialog(product)}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
+    <thead>
+        <tr className="bg-muted text-left">
+            <th className="p-2 border-b">Name</th>
+            <th className="p-2 border-b">SKU</th>
+            <th className="p-2 border-b">Category</th>
+            <th className="p-2 border-b">Price</th>
+            <th className="p-2 border-b">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {searchResults.data.map((product) => (
+            <tr key={product.id}>
+                <td className="p-2 border-b">{product.name}</td>
+                <td className="p-2 border-b">{product.sku || '-'}</td>
+                <td className="p-2 border-b">
+                    {typeof product.category === 'object' 
+                        ? product.category?.name 
+                        : product.category || '-'}
+                </td>
+                <td className="p-2 border-b">${product.price.toFixed(2)}</td>
+                <td className="p-2 border-b flex gap-2">
+                    <Link href={`/products/${product.id}/edit`}>
+                        <Button size="sm">Edit</Button>
+                    </Link>
+                    <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => openDeleteProductDialog(product)}
+                    >
+                        Delete
+                    </Button>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
 
-                                </table>
 
                                 <div className="mt-4 flex justify-end gap-2">
                                     {products.prev_page_url && (

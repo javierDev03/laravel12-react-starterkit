@@ -61,6 +61,7 @@ class RolePermissionSeeder extends Seeder
                     'access-view',
                     'dashboard-view',
                     'clients-view',
+                    'products-view',
                     'sales-view',
                     'roles-view',
                     'roles-create',

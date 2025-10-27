@@ -1,4 +1,5 @@
 import React from 'react';
+import { router } from '@inertiajs/react';
 import { Link, usePage, } from '@inertiajs/react';
 import { Inertia } from '@inertiajs/inertia';
 import AppLayout from '@/layouts/app-layout';
@@ -51,7 +52,7 @@ export default function ClientsIndex() {
 
   const handleDelete = () => {
     if (clientToDelete) {
-      Inertia.delete(`/clients/${clientToDelete.id}`);
+      router.delete(`/clients/${clientToDelete.id}`);
       setOpenDialog(false);
       setClientToDelete(null);
     }
